@@ -1,8 +1,8 @@
 import { Item, PrismaClient, Prisma } from "@/generated/prisma";
 import { PaginatedServiceResponse, ServiceResponseType } from "@/types/service.type";
 import { createItemDTO, getItemDTO } from "@pharmacy/zod";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
+import { ClientItem } from "@pharmacy/types";
 
 export async function getItem(params: getItemDTO): Promise<PaginatedServiceResponse<Item[]>> {
     try {
@@ -30,7 +30,7 @@ export async function getItem(params: getItemDTO): Promise<PaginatedServiceRespo
                 skip,
                 take: params.limit,
                 orderBy: {
-                    name: 'desc'
+                    createdAt: 'desc'
                 }
             }),
             prisma.item.count({ where: whereClause })
@@ -60,7 +60,7 @@ export async function createItem(payload: createItemDTO): Promise<ServiceRespons
         const res = await prisma.item.upsert({
             where: { name: payload.name },
             create: {...payload},
-            update: {...payload}
+            update: {}
         });
 
         return {
@@ -130,6 +130,35 @@ export async function deleteItem(id: number): Promise<ServiceResponseType<Item>>
             success: true,
             message: "Success!",
             data: res
+        }
+    } catch (error) {
+        return {
+            success: false,
+            message: error instanceof Error ? error.message : "",
+            data: null
+        }
+    }
+}
+
+export async function getItemSelect(query?: string): Promise<ServiceResponseType<ClientItem[]>> {
+    try {
+        const res = await prisma.item.findMany({
+            where: {
+                name: { contains: query, mode: "insensitive" }
+            }
+        });
+
+        const serialize = res.map(i => {
+            return {
+                ...i,
+                price: i.price.toString()
+            }
+        });
+
+        return {
+            success: true,
+            message: "Success",
+            data: serialize
         }
     } catch (error) {
         return {

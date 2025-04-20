@@ -1,6 +1,6 @@
-'use servier';
+'use server';
 import { Category } from "@/generated/prisma";
-import { createCategory, deleteCategory, updateCategory } from "@pharmacy/services/category.service";
+import { createCategory, deleteCategory, getAllCategories, updateCategory } from "@pharmacy/services/category.service";
 import { createCategoryDTO, createCategorySchema } from "@pharmacy/zod";
 import { ActionResponseType } from "@/types/action.type";
 import { withAuth } from "@/lib/server.action.wrapper";
@@ -59,9 +59,15 @@ export const deleteCategoryAction = async (prevState: ActionResponseType<Categor
     const id = formData.get('id') as unknown as number;
 
     const res = await withAuth({
-        action: () => deleteCategory(id),
-        requireAuth: false
+        action: () => deleteCategory(id)
     });
 
     return res;
+}
+
+export const getAllCategoriesAction = async (prevState: ActionResponseType<Category[]>, formData: FormData): Promise<ActionResponseType<Category[]>> => {
+    return await withAuth({
+        action: () => getAllCategories(),
+        requireAuth: false
+    });
 }

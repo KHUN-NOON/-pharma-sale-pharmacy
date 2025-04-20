@@ -3,7 +3,7 @@
 import { Unit } from "@/generated/prisma";
 import { withAuth } from "@/lib/server.action.wrapper";
 import { ActionResponseType } from "@/types/action.type";
-import { createUnit, deleteUnit, updateUnit } from "@pharmacy/services/unit.service";
+import { createUnit, deleteUnit, getAllUnits, updateUnit } from "@pharmacy/services/unit.service";
 import { createUnitDTO, createUnitSchema } from "@pharmacy/zod";
 
 export const createUnitAction = async (prevState: ActionResponseType<Unit>, formData: FormData): Promise<ActionResponseType<Unit>> => {
@@ -59,6 +59,14 @@ export const deleteUnitAction = async (prevState: ActionResponseType<Unit>, form
 
     const res = await withAuth({
         action: () => deleteUnit(id)
+    });
+
+    return res;
+}
+
+export const getAllUnitsAction = async (prevState: ActionResponseType<Unit[]>, formData: FormData): Promise<ActionResponseType<Unit[]>> => {
+    const res = await withAuth({
+        action: () => getAllUnits()
     });
 
     return res;

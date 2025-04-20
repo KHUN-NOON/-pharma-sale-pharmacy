@@ -1,8 +1,25 @@
 import { Prisma, PrismaClient, Unit } from "@/generated/prisma";
 import { createUnitDTO, getUnitDTO } from "@pharmacy/zod";
 import { PaginatedServiceResponse, ServiceResponseType } from "@/types/service.type";
+import { prisma } from "@/lib/prisma";
 
-const prisma = new PrismaClient();
+export async function getAllUnits(): Promise<ServiceResponseType<Unit[]>> {
+    try {
+        const res = await prisma.unit.findMany();
+
+        return {
+            success: true,
+            message: "Success!",
+            data: res
+        }
+    } catch (error) {
+        return {
+            message: error instanceof Error ? error.message : "Unkown Error!",
+            success: true,
+            data: null
+        };
+    }
+}
 
 export async function getUnits(params: getUnitDTO): Promise<PaginatedServiceResponse<Unit[]>> {
     try {
@@ -26,7 +43,7 @@ export async function getUnits(params: getUnitDTO): Promise<PaginatedServiceResp
                 skip,
                 take: params.limit,
                 orderBy: {
-                    name: 'desc'
+                    createdAt: 'desc'
                 }
             }),
             prisma.unit.count({ where: whereClause })

@@ -1,8 +1,25 @@
-import { Category, Prisma, PrismaClient } from "@/generated/prisma";
+import { Category, Prisma } from "@/generated/prisma";
+import { prisma } from "@/lib/prisma";
 import { createCategoryDTO, getCategoryDTO } from "@pharmacy/zod"
 import { PaginatedServiceResponse, ServiceResponseType } from "@/types/service.type";
 
-const prisma = new PrismaClient();
+export async function getAllCategories(): Promise<ServiceResponseType<Category[]>> {
+    try {
+        const res = await prisma.category.findMany();
+
+        return {
+            message: 'Success',
+            success: true,
+            data: res
+        }
+    } catch (error) {
+        return {
+            success: false,
+            message: error instanceof Error ? error.message : "Unknown Error!",
+            data: null
+        }
+    }   
+}
 
 export async function getCategories(params: getCategoryDTO): Promise<PaginatedServiceResponse<Category[]>> {
     try {
