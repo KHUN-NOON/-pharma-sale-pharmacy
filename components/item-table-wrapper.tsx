@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { X } from 'lucide-react';
 import ConfirmDeleteDialog from "@/components/ui/confirm-delete-dialog";
+import FullscreenLoading from "@/components/ui/fullscreen-loading";
 
 export default function ItemTableWrapper({ data, paginationProps }: { data: any, paginationProps: PaginationControlsProps }) {
     const [open, setOpen] = useState(false);
@@ -22,6 +23,7 @@ export default function ItemTableWrapper({ data, paginationProps }: { data: any,
     const [search, setSearch] = useState('');
     const [alertOpen, setAlertOpen] = useState(false);
     const [deleteId, setDeleteId] = useState<number | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -61,23 +63,23 @@ export default function ItemTableWrapper({ data, paginationProps }: { data: any,
 
     const handleSearch = (value: string) => {
         const params = new URLSearchParams(searchParams);
-    
+
         if (value.trim()) {
-          params.set('page', '1');
-          params.set('limit', '10');
-          params.set('search', value.trim());
+            params.set('page', '1');
+            params.set('limit', '10');
+            params.set('search', value.trim());
         } else {
-          params.delete('search');
-          params.delete('page');
-          params.delete('limit');
+            params.delete('search');
+            params.delete('page');
+            params.delete('limit');
         }
-    
+
         router.push(`?${params.toString()}`);
     };
-    
-      const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
-          handleSearch(search);
+            handleSearch(search);
         }
     };
 
@@ -113,6 +115,10 @@ export default function ItemTableWrapper({ data, paginationProps }: { data: any,
 
     return (
         <>
+            <FullscreenLoading
+                text='Loading'
+                isLoading={isLoading}
+            />
             <div className="flex justify-end mb-3">
                 <Button onClick={handleCreate}>
                     Create New Item
@@ -126,6 +132,11 @@ export default function ItemTableWrapper({ data, paginationProps }: { data: any,
                     onChange={(e) => setSearch(e.target.value)}
                     onKeyDown={handleKeyDown}
                 />
+                <Button
+                    onClick={() => handleSearch(search)}
+                >
+                    Search
+                </Button>
                 <Button
                     onClick={handleClear}
                     variant='outline'
@@ -142,7 +153,7 @@ export default function ItemTableWrapper({ data, paginationProps }: { data: any,
                 currItem={currItem}
                 setCurrItem={setCurrItem}
             />
-            <ConfirmDeleteDialog 
+            <ConfirmDeleteDialog
                 id={deleteId}
                 open={alertOpen}
                 onOpenChange={setAlertOpen}

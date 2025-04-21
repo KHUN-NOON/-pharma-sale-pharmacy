@@ -241,7 +241,11 @@ export default function ItemFormModal({ open = false, setOpen, currItem, setCurr
                                         {...field}
                                         type="number"
                                         step="0.01"
-                                        onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                                        onChange={(e) => {
+                                            // Handle empty input or invalid numbers
+                                            const value = e.target.value;
+                                            field.onChange(value === '' ? '' : Number(value));
+                                        }}
                                     />
                                 )}
                             />

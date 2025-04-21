@@ -39,6 +39,9 @@ export const columns = ({edit, deleteItem}: columnProps): ColumnDef<ItemRow>[] =
             accessorKey: "stockQuantity",
             header: "Quantity",
             size: 100,
+            cell({row}) {
+                return row.original.stockQuantity.toLocaleString();
+            }
         },
         {
             accessorKey: "actions",
